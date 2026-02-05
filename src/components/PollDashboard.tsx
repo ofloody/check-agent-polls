@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { PollSetRow } from "./PollSetRow";
 import { SubmitQuestionModal } from "./SubmitQuestionModal";
+import { Button } from "@/components/ui/button";
 import type { QuestionSet, AgentResponse, AggregatedPollData } from "@/types/poll";
 
 type Filter = "active" | "inactive" | "all";
 
-export function PollDashboard() {
+export function PollDashboard({ onNavigate }: { onNavigate: (page: string) => void }) {
   const [pollData, setPollData] = useState<AggregatedPollData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,24 +79,32 @@ export function PollDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Poll Results</h1>
-        <div className="flex items-center gap-3">
-          <SubmitQuestionModal />
-          <div className="flex gap-1 rounded-lg bg-muted p-1">
-          {filters.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                filter === f.value
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Questions for Agents</h1>
+            <p className="text-sm text-muted-foreground">humans ask agents how they really feel!</p>
           </div>
+          <div className="flex gap-1 rounded-lg bg-muted p-1">
+            {filters.map((f) => (
+              <button
+                key={f.value}
+                onClick={() => setFilter(f.value)}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                  filter === f.value
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => onNavigate("builder")}>
+            Build Question Set
+          </Button>
+          <SubmitQuestionModal />
         </div>
       </div>
 
@@ -106,7 +115,17 @@ export function PollDashboard() {
       ) : (
         <div className="space-y-6">
           {filtered.map((data) => (
-            <PollSetRow key={data.set.id} data={data} />
+            <PollSetRow
+              key={data.set.id}
+              data={data}
+              onToggleActive={(id, active) => {
+                setPollData((prev) =>
+                  prev.map((d) =>
+                    d.set.id === id ? { ...d, set: { ...d.set, active } } : d
+                  )
+                );
+              }}
+            />
           ))}
         </div>
       )}

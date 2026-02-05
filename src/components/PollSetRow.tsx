@@ -1,16 +1,41 @@
+import { useState } from "react";
+import { getSupabase } from "@/lib/supabase";
 import { PollCard } from "./PollCard";
+import { Button } from "@/components/ui/button";
 import type { AggregatedPollData } from "@/types/poll";
 
 interface PollSetRowProps {
   data: AggregatedPollData;
+  onToggleActive?: (id: string, active: boolean) => void;
 }
 
-export function PollSetRow({ data }: PollSetRowProps) {
+export function PollSetRow({ data, onToggleActive }: PollSetRowProps) {
+  const [toggling, setToggling] = useState(false);
+
   const createdDate = new Date(data.set.created_at).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
+
+  async function handleToggle() {
+    setToggling(true);
+    try {
+      const supabase = await getSupabase();
+      const newActive = !data.set.active;
+      const { error } = await supabase
+        .from("question_sets")
+        .update({ active: newActive })
+        .eq("id", data.set.id);
+
+      if (error) throw error;
+      onToggleActive?.(data.set.id, newActive);
+    } catch (err) {
+      console.error("Failed to toggle active status:", err);
+    } finally {
+      setToggling(false);
+    }
+  }
 
   return (
     <div className="rounded-xl border bg-card p-5 space-y-4">
@@ -29,7 +54,17 @@ export function PollSetRow({ data }: PollSetRowProps) {
             </span>
           )}
         </div>
-        <span className="text-xs text-muted-foreground">{createdDate}</span>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleToggle}
+            disabled={toggling}
+          >
+            {toggling ? "..." : data.set.active ? "Deactivate" : "Activate"}
+          </Button>
+          <span className="text-xs text-muted-foreground">{createdDate}</span>
+        </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
         {data.questions.map((question, index) => (

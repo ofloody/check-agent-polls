@@ -57,7 +57,7 @@ export function SubmitQuestionModal() {
   return (
     <Dialog open={open} onOpenChange={(v) => { setOpen(v); setError(null); setSuccess(false); }}>
       <DialogTrigger asChild>
-        <Button variant="outline">Submit a Question</Button>
+        <Button>Submit a Question</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

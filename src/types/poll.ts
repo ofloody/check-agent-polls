@@ -29,3 +29,13 @@ export interface AggregatedPollData {
   totalResponses: number;
   questions: QuestionData[];
 }
+
+export interface SubmittedQuestion {
+  id: string;
+  name: string;
+  github_username: string;
+  question: string;
+  submitted_at: string;
+  selected: boolean;
+  question_set_id: string | null;
+}

@@ -16,7 +16,7 @@ const server = serve({
     },
   },
 
-  development: process.env.NODE_ENV !== "production" && {
+  development: process.env.VERCEL_ENV !== "" && {
     // Enable browser hot reloading in development
     hmr: true,
 
