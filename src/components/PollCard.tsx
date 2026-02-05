@@ -17,7 +17,9 @@ export function PollCard({ questionNumber, data }: PollCardProps) {
           Question {questionNumber}
         </p>
       </div>
-      <Gauge yesCount={data.yesCount} noCount={data.noCount} />
+      <div className="mt-auto">
+        <Gauge yesCount={data.yesCount} noCount={data.noCount} />
+      </div>
     </div>
   );
 }

@@ -26,8 +26,9 @@ export function QuestionSetBuilder({ onNavigate }: { onNavigate: () => void }) {
 
         if (fetchError) throw fetchError;
         setQuestions(data as SubmittedQuestion[]);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch questions");
+      } catch {
+        // If table doesn't exist or fetch fails, just show empty state
+        setQuestions([]);
       } finally {
         setLoading(false);
       }
