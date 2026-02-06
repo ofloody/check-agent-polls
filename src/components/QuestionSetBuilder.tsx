@@ -56,9 +56,23 @@ export function QuestionSetBuilder({ onNavigate }: { onNavigate: () => void }) {
         (id) => questions.find((q) => q.id === id)!
       );
 
+      // Generate ID like "1feb2026"
+      const months = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+      const now = new Date();
+      const monthYear = months[now.getMonth()] + now.getFullYear();
+
+      const { data: existing } = await supabase
+        .from("question_sets")
+        .select("id")
+        .like("id", `%${monthYear}`);
+
+      const setNumber = (existing?.length ?? 0) + 1;
+      const setId = `${setNumber}${monthYear}`;
+
       const { data: newSet, error: insertError } = await supabase
         .from("question_sets")
         .insert({
+          id: setId,
           name: setName.trim(),
           q1: selectedQuestions[0].question,
           q2: selectedQuestions[1].question,

@@ -3,11 +3,19 @@ import { getSupabase } from "@/lib/supabase";
 import { PollSetRow } from "./PollSetRow";
 import { SubmitQuestionModal } from "./SubmitQuestionModal";
 import { Button } from "@/components/ui/button";
-import type { QuestionSet, AgentResponse, AggregatedPollData } from "@/types/poll";
+import type {
+  QuestionSet,
+  AgentResponse,
+  AggregatedPollData,
+} from "@/types/poll";
 
 type Filter = "active" | "inactive" | "all";
 
-export function PollDashboard({ onNavigate }: { onNavigate: (page: string) => void }) {
+export function PollDashboard({
+  onNavigate,
+}: {
+  onNavigate: (page: string) => void;
+}) {
   const [pollData, setPollData] = useState<AggregatedPollData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +43,7 @@ export function PollDashboard({ onNavigate }: { onNavigate: (page: string) => vo
 
         const aggregated = aggregatePollData(
           sets as QuestionSet[],
-          responses as AgentResponse[]
+          responses as AgentResponse[],
         );
         setPollData(aggregated);
       } catch (err) {
@@ -82,7 +90,9 @@ export function PollDashboard({ onNavigate }: { onNavigate: (page: string) => vo
         <div className="flex items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold">Questions for Agents</h1>
-            <p className="text-sm text-muted-foreground">humans ask agents how they really feel!</p>
+            <p className="text-sm text-muted-foreground">
+              humans asking agents how they really feel!
+            </p>
           </div>
           <div className="flex gap-1 rounded-lg bg-muted p-1">
             {filters.map((f) => (
@@ -121,8 +131,8 @@ export function PollDashboard({ onNavigate }: { onNavigate: (page: string) => vo
               onToggleActive={(id, active) => {
                 setPollData((prev) =>
                   prev.map((d) =>
-                    d.set.id === id ? { ...d, set: { ...d.set, active } } : d
-                  )
+                    d.set.id === id ? { ...d, set: { ...d.set, active } } : d,
+                  ),
                 );
               }}
             />
@@ -135,7 +145,7 @@ export function PollDashboard({ onNavigate }: { onNavigate: (page: string) => vo
 
 function aggregatePollData(
   sets: QuestionSet[],
-  responses: AgentResponse[]
+  responses: AgentResponse[],
 ): AggregatedPollData[] {
   return sets.map((set) => {
     const setResponses = responses.filter((r) => r.question_set_id === set.id);

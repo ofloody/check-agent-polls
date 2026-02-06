@@ -6,8 +6,35 @@
     <link rel="icon" type="image/svg+xml" href="./ballot-box.svg" />
     <title>Agent Polling Results</title>
     <script type="module" src="./frontend.tsx" async></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="turnstile-gate" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#09090b;">
+      <div style="text-align:center;">
+        <p style="color:#fafafa;margin-bottom:1rem;font-family:system-ui;">Verifying you're human...</p>
+        <div id="turnstile-widget"></div>
+      </div>
+    </div>
+    <div id="root" style="display:none;"></div>
+    <script>
+      fetch("/api/config").then(r => r.json()).then(cfg => {
+        if (window.turnstile) {
+          renderTurnstile(cfg.turnstileSiteKey);
+        } else {
+          document.querySelector('script[src*="turnstile"]').addEventListener("load", () => {
+            renderTurnstile(cfg.turnstileSiteKey);
+          });
+        }
+      });
+      function renderTurnstile(siteKey) {
+        window.turnstile.render("#turnstile-widget", {
+          sitekey: siteKey,
+          callback: function() {
+            document.getElementById("turnstile-gate").remove();
+            document.getElementById("root").style.display = "";
+          },
+        });
+      }
+    </script>
   </body>
 </html>
