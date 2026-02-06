@@ -59,7 +59,7 @@ export function QuestionSetBuilder({ onNavigate }: { onNavigate: () => void }) {
       // Generate ID like "1feb2026"
       const months = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
       const now = new Date();
-      const monthYear = months[now.getMonth()] + now.getFullYear();
+      const monthYear = months[now.getMonth()]! + now.getFullYear();
 
       const { data: existing } = await supabase
         .from("question_sets")
@@ -74,10 +74,10 @@ export function QuestionSetBuilder({ onNavigate }: { onNavigate: () => void }) {
         .insert({
           id: setId,
           name: setName.trim(),
-          q1: selectedQuestions[0].question,
-          q2: selectedQuestions[1].question,
-          q3: selectedQuestions[2].question,
-          active: true,
+          q1: selectedQuestions[0]!.question,
+          q2: selectedQuestions[1]!.question,
+          q3: selectedQuestions[2]!.question,
+          active: false,
         })
         .select()
         .single();

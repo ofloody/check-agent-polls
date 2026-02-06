@@ -56,11 +56,13 @@ export function PollDashboard({
     fetchData();
   }, []);
 
-  const filtered = pollData.filter((d) => {
-    if (filter === "active") return d.set.active;
-    if (filter === "inactive") return !d.set.active;
-    return true;
-  });
+  const filtered = pollData
+    .filter((d) => {
+      if (filter === "active") return d.set.active;
+      if (filter === "inactive") return !d.set.active;
+      return true;
+    })
+    .sort((a, b) => (a.set.active === b.set.active ? 0 : a.set.active ? -1 : 1));
 
   if (loading) {
     return (
@@ -130,9 +132,12 @@ export function PollDashboard({
               data={data}
               onToggleActive={(id, active) => {
                 setPollData((prev) =>
-                  prev.map((d) =>
-                    d.set.id === id ? { ...d, set: { ...d.set, active } } : d,
-                  ),
+                  prev.map((d) => {
+                    if (d.set.id === id) return { ...d, set: { ...d.set, active } };
+                    // If activating a set, deactivate all others
+                    if (active) return { ...d, set: { ...d.set, active: false } };
+                    return d;
+                  }),
                 );
               }}
             />

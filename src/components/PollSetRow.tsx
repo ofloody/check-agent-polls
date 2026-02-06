@@ -23,6 +23,17 @@ export function PollSetRow({ data, onToggleActive }: PollSetRowProps) {
     try {
       const supabase = await getSupabase();
       const newActive = !data.set.active;
+
+      // If activating, deactivate all other sets first
+      if (newActive) {
+        const { error: deactivateError } = await supabase
+          .from("question_sets")
+          .update({ active: false })
+          .neq("id", data.set.id);
+
+        if (deactivateError) throw deactivateError;
+      }
+
       const { error } = await supabase
         .from("question_sets")
         .update({ active: newActive })
@@ -41,6 +52,7 @@ export function PollSetRow({ data, onToggleActive }: PollSetRowProps) {
     <div className="rounded-xl border bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
+          {data.set.active && <span className="text-yellow-500 text-lg">&#9889;</span>}
           <h2 className="text-lg font-semibold">{data.set.id}</h2>
           {data.set.name && (
             <span className="text-sm text-muted-foreground">{data.set.name}</span>
